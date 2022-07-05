@@ -1,0 +1,5 @@
+# Pluckr
+
+```
+./gradlew run
+```
