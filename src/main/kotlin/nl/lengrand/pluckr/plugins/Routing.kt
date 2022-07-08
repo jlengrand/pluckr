@@ -6,13 +6,10 @@ import io.ktor.server.application.*
 import io.ktor.server.http.content.*
 import io.ktor.server.response.*
 import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.configureRouting(database: Database) {
 
     val controller = Controller(database)
-    // Starting point for a Ktor app:
     routing {
 
         get("/trees") {
@@ -23,10 +20,10 @@ fun Application.configureRouting(database: Database) {
             call.respondText("Hello the World!")
         }
 
-//        static("/") {
-//            staticBasePackage = "dist"
-//            defaultResource("index.html")
-//            resources(".")
-//        }
+        static("/") {
+            staticBasePackage = "dist"
+            defaultResource("index.html")
+            resources(".")
+        }
     }
 }
