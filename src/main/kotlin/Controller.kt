@@ -1,7 +1,6 @@
 import kotlinx.serialization.KSerializer
+import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-import kotlinx.serialization.descriptors.PrimitiveKind
-import kotlinx.serialization.descriptors.PrimitiveSerialDescriptor
 import kotlinx.serialization.descriptors.SerialDescriptor
 import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
@@ -21,19 +20,23 @@ data class Tree(
     val location : Point
 )
 
-object PointSerializer : KSerializer<Point> {
-    override val descriptor = PrimitiveSerialDescriptor("Point", PrimitiveKind.STRING)
+@Serializable
+@SerialName("Point")
+private class PointSurrogate(val srid: Int, val x: Double, val y: Double)
 
-    override fun deserialize(decoder: Decoder): Point {
-        return Point(decoder.decodeString())
-    }
+object PointSerializer : KSerializer<Point> {
+    override val descriptor: SerialDescriptor = PointSurrogate.serializer().descriptor
 
     override fun serialize(encoder: Encoder, value: Point) {
-        encoder.encodeString(value.toString())
+        val surrogate = PointSurrogate(value.srid, value.x, value.y)
+        encoder.encodeSerializableValue(PointSurrogate.serializer(), surrogate)
     }
 
+    override fun deserialize(decoder: Decoder): Point {
+        val surrogate = decoder.decodeSerializableValue(PointSurrogate.serializer())
+        return Point(surrogate.x, surrogate.y)
+    }
 }
-
 
 private fun fromRow(it: ResultRow): Tree {
     return Tree(it[Trees.id], it[Trees.name], it[Trees.description], it[Trees.location])
