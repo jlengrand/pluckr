@@ -10,10 +10,13 @@ import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ColumnType
 import org.jetbrains.exposed.sql.Table
 
-object Trees : IntIdTable() {
+object Trees : Table() {
+    val id = integer("id").autoIncrement()
     val name  = varchar("name", 100)
     val description  = text("description")
     val location = point("location")
+
+    override val primaryKey = PrimaryKey(id) // name is optional here
 }
 
 fun Table.point(name: String, srid: Int = 4326): Column<Point>
@@ -33,10 +36,10 @@ private class PointColumnType(val srid: Int = 4326): ColumnType() {
     }
 }
 
-class Tree(id: EntityID<Int>) : IntEntity(id) {
-    companion object : IntEntityClass<Tree>(Trees)
-
-    var name by Trees.name
-    var description by Trees.description
-    var location by Trees.location
-}
+//class Tree(id: EntityID<Int>) : IntEntity(id) {
+//    companion object : IntEntityClass<Tree>(Trees)
+//
+//    var name by Trees.name
+//    var description by Trees.description
+//    var location by Trees.location
+//}

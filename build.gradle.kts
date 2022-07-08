@@ -6,6 +6,7 @@ val exposedVersion: String by project
 plugins {
     application
     kotlin("jvm") version "1.7.0"
+    kotlin("plugin.serialization") version "1.6.21"
 }
 
 
@@ -33,8 +34,10 @@ dependencies {
     implementation("org.jetbrains.exposed:exposed-core:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-dao:$exposedVersion")
     implementation("org.jetbrains.exposed:exposed-jdbc:$exposedVersion")
+    implementation("io.ktor:ktor-server-content-negotiation:$ktor_version")
+    implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.postgresql:postgresql:42.3.6")
-        implementation("net.postgis:postgis-jdbc:2021.1.0")
+    implementation("net.postgis:postgis-jdbc:2021.1.0")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")

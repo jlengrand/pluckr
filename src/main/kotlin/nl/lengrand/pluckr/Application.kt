@@ -1,10 +1,13 @@
 package nl.lengrand.pluckr
 
+import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.engine.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
+import io.ktor.server.plugins.contentnegotiation.*
+import kotlinx.serialization.json.Json
 import net.postgis.jdbc.geometry.Point
 import nl.lengrand.pluckr.plugins.*
 import org.jetbrains.exposed.sql.*
@@ -14,6 +17,12 @@ fun Application.myapp(){
 
     val database = initDb()
 
+    install(ContentNegotiation){
+        json(Json {
+            prettyPrint = true
+            isLenient = true
+        })
+    }
     install(CallLogging)
     install(MicrometerMetrics)
 
@@ -52,7 +61,7 @@ fun main() {
     embeddedServer(
         Netty,
         module =  Application::myapp,
-        port = 8080,
+        port = 9090,
         host = "0.0.0.0")
         .start(wait = true)
 }
