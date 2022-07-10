@@ -12,9 +12,19 @@ fun Application.configureRouting(database: Database) {
     val controller = Controller(database)
     routing {
 
-        get("/trees") {
-            call.respond(controller.getTrees())
+        get("/api/trees") {
+            println("IN HERE FIRST")
+            if(call.request.queryParameters["bbox"] != null){
+                println("IN HERE")
+                val bbox = call.request.queryParameters["bbox"]?.split(",")?.map { it.toDouble() }
+                call.respond(controller.getTrees(bbox))
+            }
+            else{
+                call.respond(controller.getTrees())
+            }
         }
+
+
 
         get("/hello") {
             call.respondText("Hello the World!")

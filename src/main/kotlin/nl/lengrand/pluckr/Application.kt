@@ -7,6 +7,7 @@ import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
+import io.ktor.server.plugins.cors.routing.*
 import kotlinx.serialization.json.Json
 import net.postgis.jdbc.geometry.Point
 import nl.lengrand.pluckr.plugins.*
@@ -17,6 +18,7 @@ fun Application.myapp(){
 
     val database = initDb()
 
+    install(CORS)
     install(ContentNegotiation){
         json(Json {
             prettyPrint = true
@@ -24,7 +26,7 @@ fun Application.myapp(){
         })
     }
     install(CallLogging)
-    install(MicrometerMetrics)
+//    install(MicrometerMetrics)
 
     configureRouting(database)
 }
@@ -44,11 +46,11 @@ fun initDb(): Database {
 //            location = Point(52.04681865145196, 5.079779509938945)
 //        }
 
-        Trees.insert {
-            it[name] = "Laurier 2"
-            it[description] = "un laurier accessible à tous"
-            it[location] = Point(52.04681865145196, 5.079779509938945)
-        }
+//        Trees.insert {
+//            it[name] = "Laurier 2"
+//            it[description] = "un laurier accessible à tous"
+//            it[location] = Point(52.04681865145196, 5.079779509938945)
+//        }
 
 
 //        println("Trees: ${Tree.all().joinToString {it.location.value}}")

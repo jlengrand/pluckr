@@ -45,15 +45,15 @@ private fun fromRow(it: ResultRow): Tree {
 class Controller(private val database: Database) {
 
     fun getTrees() : ArrayList<Tree> {
-        println("CALLED")
         val trees : ArrayList<Tree> = arrayListOf()
-
         transaction(database){
             Trees.selectAll().map { trees.add(fromRow(it)) }
         }
-
-        println(trees)
-
         return trees
+    }
+
+    fun getTrees(bbox: List<Double>?) : ArrayList<Tree> {
+        println(bbox)
+        return getTrees()
     }
 }
