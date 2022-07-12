@@ -25,6 +25,13 @@ export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
   // appIndex: 'demo/index.html',
 
   plugins: [
+    {
+      transformImport({source}) {
+        if(source.includes('leaflet')) {
+          return source.replace('leaflet/dist/leaflet-src.js', 'leaflet/dist/leaflet-src.esm.js');
+        }
+      }
+    },
     /** Use Hot Module Replacement by uncommenting. Requires @open-wc/dev-server-hmr plugin */
     // hmr && hmrPlugin({ exclude: ['**/*/node_modules/**/*'], presets: [presets.litElement] }),
   ],

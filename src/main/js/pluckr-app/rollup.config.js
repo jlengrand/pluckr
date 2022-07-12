@@ -7,6 +7,7 @@ import { generateSW } from 'rollup-plugin-workbox';
 import path from 'path';
 
 export default {
+
   input: 'index.html',
   output: {
     entryFileNames: '[hash].js',
@@ -18,6 +19,13 @@ export default {
   preserveEntrySignatures: false,
 
   plugins: [
+    {
+      resolveId(source) {
+        if(source === 'leaflet') {
+          return path.resolve(__dirname, 'node_modules/leaflet/dist/leaflet-src.esm.js');
+        }
+      }
+    },
     /** Enable using HTML as rollup entrypoint */
     html({
       minify: true,
