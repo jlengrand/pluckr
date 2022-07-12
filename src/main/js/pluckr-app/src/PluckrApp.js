@@ -1,7 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import '@vaadin/text-field';
 import '@vaadin/icons';
-import mapbox from '../dist/mapbox-gl.esm.js'
+import mapboxgl from '../dist/mapbox-gl.esm.js'
 import MapboxGeocoder from '../dist/mapbox-gl-geocoder.esm.min.js'
 
 export class PluckrApp extends LitElement {
@@ -50,7 +50,7 @@ export class PluckrApp extends LitElement {
   firstUpdated(_changedProperties) {
     super.firstUpdated(_changedProperties);
 
-    this.map = new mapbox.Map({
+    this.map = new mapboxgl.Map({
       accessToken: 'pk.eyJ1IjoiamxlbmdyYW5kIiwiYSI6ImNsNWM3YTl3YjBla3ozYm8yMHo3NTRtbHkifQ.mhHRpOn0v-v59tXbvEYnlQ',
       container: this.renderRoot.querySelector('#map'),
       style: 'mapbox://styles/mapbox/streets-v11',
@@ -61,7 +61,7 @@ export class PluckrApp extends LitElement {
     this.map.addControl(
       new MapboxGeocoder({
       accessToken: 'pk.eyJ1IjoiamxlbmdyYW5kIiwiYSI6ImNsNWM3YTl3YjBla3ozYm8yMHo3NTRtbHkifQ.mhHRpOn0v-v59tXbvEYnlQ',
-      mapboxgl: mapbox
+      mapboxgl: mapboxgl
       })
     );
 
@@ -76,7 +76,7 @@ export class PluckrApp extends LitElement {
       .then(data => {
         console.log('Loaded POIs', data);
         data.map(p =>
-          new mapbox.Marker()
+          new mapboxgl.Marker()
             .setLngLat([p.location.y, p.location.x])
             .addTo(this.map)
         );
