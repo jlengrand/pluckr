@@ -1,13 +1,17 @@
 package nl.lengrand.pluckr
 
+import UserSession
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.engine.*
 import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.sessions.*
 import kotlinx.serialization.json.Json
 import net.postgis.jdbc.geometry.Point
 import nl.lengrand.pluckr.plugins.*
@@ -18,7 +22,29 @@ fun Application.myapp(){
 
     val database = initDb()
 
-    install(CORS)
+    install(Sessions) {
+        cookie<UserSession>("user_session") {
+            cookie.path = "/"
+            cookie.maxAgeInSeconds = 6000
+        }
+    }
+
+    install(Authentication) {
+        session<UserSession>("auth-session") {
+            validate { session ->
+                if(session.name.startsWith("jet")) {
+                    session
+                } else {
+                    null
+                }
+            }
+            challenge {
+                call.respondRedirect("/login")
+            }
+        }
+    }
+
+//    install(CORS)
     install(ContentNegotiation){
         json(Json {
             prettyPrint = true

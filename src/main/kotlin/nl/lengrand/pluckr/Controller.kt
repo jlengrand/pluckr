@@ -1,3 +1,4 @@
+import io.ktor.server.auth.*
 import kotlinx.serialization.KSerializer
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
@@ -10,6 +11,9 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+
+@Serializable
+data class UserSession(val name: String) : Principal
 
 @Serializable
 data class Tree(
@@ -43,7 +47,6 @@ private fun fromRow(it: ResultRow): Tree {
 }
 
 class Controller(private val database: Database) {
-
     fun getTrees() : ArrayList<Tree> {
         val trees : ArrayList<Tree> = arrayListOf()
         transaction(database){

@@ -1,6 +1,10 @@
 import { LitElement, html, css } from 'lit';
 import '@vaadin/text-field';
 import '@vaadin/icons';
+import '@vaadin/app-layout';
+import '@vaadin/app-layout/vaadin-drawer-toggle.js';
+import '@vaadin/tabs';
+
 import mapboxgl from '../dist/mapbox-gl.esm.js'
 import MapboxGeocoder from '../dist/mapbox-gl-geocoder.esm.min.js'
 
@@ -101,13 +105,34 @@ export class PluckrApp extends LitElement {
       />
       <link href='https://api.mapbox.com/mapbox-gl-js/v2.9.1/mapbox-gl.css' rel='stylesheet' />
       <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-geocoder/v5.0.0/mapbox-gl-geocoder.css" type="text/css">
-      <main>
-        <h1>${this.title}</h1>
-        <vaadin-text-field placeholder="Search">
-          <vaadin-icon slot="prefix" icon="vaadin:search"></vaadin-icon>
-        </vaadin-text-field>
-        <div id="map"></div>
-      </main>
+      <vaadin-app-layout>
+        <vaadin-drawer-toggle slot="navbar touch-optimized">
+
+        </vaadin-drawer-toggle>
+        <h3 slot="navbar touch-optimized">${this.title}</h3>
+        <!--        <h3 slot="navbar touch-optimized">Application Name</h3>-->
+        <vaadin-tabs orientation="vertical" slot="drawer">
+          <vaadin-tab>
+            <a href="/profile">
+              <vaadin-icon icon="vaadin:user"></vaadin-icon>
+              Profile
+            </a>
+          </vaadin-tab>
+          <vaadin-tab>
+            <a href="/contact">
+              <vaadin-icon icon="vaadin:phone"></vaadin-icon>
+              Contact
+            </a>
+          </vaadin-tab>
+        </vaadin-tabs>
+<!--        <div>Page content</div>-->
+        <div>
+          <vaadin-text-field placeholder="Search">
+            <vaadin-icon slot="prefix" icon="vaadin:search"></vaadin-icon>
+          </vaadin-text-field>
+          <div id="map"></div>
+        </div>
+      </vaadin-app-layout>
     `;
   }
 }
