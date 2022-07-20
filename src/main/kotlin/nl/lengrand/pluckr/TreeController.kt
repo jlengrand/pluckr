@@ -11,9 +11,23 @@ import org.jetbrains.exposed.sql.Database
 import org.jetbrains.exposed.sql.ResultRow
 import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
+import kotlinx.datetime.LocalDateTime
+import nl.lengrand.pluckr.Users
+import org.jetbrains.exposed.sql.insert
+import org.mindrot.jbcrypt.BCrypt.gensalt
+import org.mindrot.jbcrypt.BCrypt.hashpw
 
 @Serializable
 data class UserSession(val name: String) : Principal
+
+@Serializable
+data class User(
+    val id: Int? = null,
+    val username: String,
+    val password: String,
+    val createdAt: LocalDateTime,
+    val updatedAt: LocalDateTime,
+)
 
 @Serializable
 data class Tree(
@@ -46,7 +60,21 @@ private fun fromRow(it: ResultRow): Tree {
     return Tree(it[Trees.id], it[Trees.name], it[Trees.description], it[Trees.location])
 }
 
-class Controller(private val database: Database) {
+class UserController(private val database: Database){
+    fun createUser(email: String, zepassword: String) {
+        val salt = gensalt()
+        transaction(database) {
+            val user = Users.insert {
+                it[username] = email
+                it[password] = hashpw(zepassword, salt);
+            }
+            println("user")
+            println(user)
+            println("---")
+        }
+    }
+}
+class TreeController(private val database: Database) {
     fun getTrees() : ArrayList<Tree> {
         val trees : ArrayList<Tree> = arrayListOf()
         transaction(database){

@@ -7,31 +7,35 @@ import '@vaadin/text-field';
 import '@vaadin/password-field';
 import {dialogRenderer} from "@vaadin/dialog/lit";
 import '@vaadin/horizontal-layout';
+import '@vaadin/progress-bar';
 
-export class PluckrLogin extends LitElement{
+export class PluckrLogin extends LitElement {
 
   responsiveSteps = [
-    { minWidth: 0, columns: 1 },
+    {minWidth: 0, columns: 1},
   ];
 
-  static get properties(){
+  static get properties() {
     return {
-      signUpOpened : { type: Boolean }
+      signUpOpened: {type: Boolean},
+      username: {type: String},
+      password: {type: String},
+      passwordConfirm: {type: String},
+      loadingBarActive: {type: Boolean}
     };
   }
 
-  static get styles(){
-    return css`
-
-    `;
+  static get styles() {
+    return css``;
   }
 
   constructor() {
     super();
     this.signUpOpened = false;
+    this.loadingBarActive = false;
   }
 
-  render(){
+  render() {
     return html`
       <vaadin-horizontal-layout slot="navbar touch-optimized" theme="spacing padding">
         <vaadin-button theme="primary" @click="${this.signUpClicked}">Sign up</vaadin-button>
@@ -50,26 +54,64 @@ export class PluckrLogin extends LitElement{
     `;
   }
 
-  signUpClicked(){
+  signUpClicked() {
     this.signUpOpened = true;
     console.log("Signup clicked!");
   }
 
-  signUpRenderer(){
+  signUpRenderer() {
     return html`
-        <vaadin-form-layout .responsiveSteps="${this.responsiveSteps}">
-          <vaadin-text-field label="email"></vaadin-text-field>
-          <vaadin-password-field label="Password"></vaadin-password-field>
-          <vaadin-password-field label="Confirm password"></vaadin-password-field>
-          <vaadin-horizontal-layout theme="spacing padding" style="justify-content: end">
-            <vaadin-button theme="secondary" @click="${() => {this.signUpOpened = false}}">Cancel</vaadin-button>
-            <vaadin-button theme="primary" @click="${this.signUp}">Sign up</vaadin-button>
-          </vaadin-horizontal-layout>
-        </vaadin-form-layout>
-      `;
+      <vaadin-form-layout .responsiveSteps="${this.responsiveSteps}">
+        <vaadin-text-field value="${this.username}" @change="${(e) => {
+          this.username = e.target.value
+        }}" label="email"></vaadin-text-field>
+        <vaadin-password-field value="${this.password}" @change="${(e) => {
+          this.password = e.target.value
+        }}" label="Password"></vaadin-password-field>
+        <vaadin-password-field value="${this.passwordConfirm}" @change="${(e) => {
+          this.passwordConfirm = e.target.value
+        }}" label="Confirm password"></vaadin-password-field>
+
+        ${ this.loadingBarActive ?
+            html`<vaadin-progress-bar indeterminate></vaadin-progress-bar>`
+            : undefined
+        }
+
+        <vaadin-horizontal-layout theme="spacing padding" style="justify-content: end">
+          <vaadin-button theme="secondary" @click="${() => {
+            this.signUpOpened = false
+          }}">Cancel
+          </vaadin-button>
+          <vaadin-button theme="primary" @click="${this.signUp}">Sign up</vaadin-button>
+        </vaadin-horizontal-layout>
+      </vaadin-form-layout>
+    `;
   }
 
-  signUp(){
-    console.log("Signup clicked!");
+  signUp() {
+    this.loadingBarActive = true;
+
+    fetch('/api/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        'username': this.username,
+        'password': this.password,
+      })
+    })
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error('Network response was not OK');
+        }
+        this.loadingBarActive = false;
+        this.signUpOpened = false;
+
+        // TODO : Add errors!
+      })
+      .catch(error => {
+        console.error('There has been a problem with your fetch operation:', error);
+      });
   }
 }

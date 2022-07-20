@@ -17,6 +17,8 @@ import net.postgis.jdbc.geometry.Point
 import nl.lengrand.pluckr.plugins.*
 import org.jetbrains.exposed.sql.*
 import org.jetbrains.exposed.sql.transactions.transaction
+import org.mindrot.jbcrypt.BCrypt
+import org.mindrot.jbcrypt.BCrypt.*
 
 fun Application.myapp(){
 
@@ -64,7 +66,23 @@ fun initDb(): Database {
     transaction {
         addLogger(StdOutSqlLogger)
 
-        SchemaUtils.create(Trees)
+        SchemaUtils.create(Trees, Users)
+
+//        val salt = gensalt()
+//        println(salt)
+//        val user = Users.insert {
+//            it[username] = "bobby2@gmail.com"
+//            it[password] = hashpw("aVerySecretPassword", salt);
+//        }
+
+//        Users.selectAll().map {
+//            println("${it[Users.username]}, ${it[Users.password]}, ${it[Users.createdAt]}, ${it[Users.updatedAt]}")
+////            if (checkpw("booby", it[Users.password]))
+////                println("It matches");
+////            else
+////                println("It does not match");
+//            println("-----")
+//        }
 
 //        val first = Tree.new {
 //            name = "Laurier"
