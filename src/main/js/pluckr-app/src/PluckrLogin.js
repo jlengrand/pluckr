@@ -21,7 +21,8 @@ export class PluckrLogin extends LitElement {
       username: {type: String},
       password: {type: String},
       passwordConfirm: {type: String},
-      loadingBarActive: {type: Boolean}
+      loadingBarActive: {type: Boolean},
+      errorMessage: {type: String}
     };
   }
 
@@ -47,7 +48,7 @@ export class PluckrLogin extends LitElement {
         header-title="SignUp"
         .opened="${this.signUpOpened}"
         @opened-changed="${e => (this.signUpOpened = e.detail.value)}"
-        ${dialogRenderer(this.signUpRenderer)}
+        ${dialogRenderer(this.signUpRenderer, [this.username, this.signUpOpened, this.password, this.loadingBarActive, this.errorMessage])}
         id="signUp">
 
       </vaadin-dialog>
@@ -77,6 +78,11 @@ export class PluckrLogin extends LitElement {
             : undefined
         }
 
+        ${ this.errorMessage ?
+          html`<p class="error" style="color:red">${this.errorMessage}</p>`
+          : undefined
+        }
+
         <vaadin-horizontal-layout theme="spacing padding" style="justify-content: end">
           <vaadin-button theme="secondary" @click="${() => {
             this.signUpOpened = false
@@ -102,15 +108,20 @@ export class PluckrLogin extends LitElement {
       })
     })
       .then((response) => {
-        if (!response.ok) {
-          throw new Error('Network response was not OK');
-        }
         this.loadingBarActive = false;
-        this.signUpOpened = false;
-
-        // TODO : Add errors!
+        if (!response.ok) {
+          this.errorMessage = response.statusText;
+          console.error('There has been a problem saving the user:', response.statusText);
+        }
+        else{
+          this.username = null;
+          this.password = null;
+          this.passwordConfirm = null;
+          this.signUpOpened = false;
+        }
       })
       .catch(error => {
+        this.errorMessage = "There has been an issue contacting the server. Please try again later"
         console.error('There has been a problem with your fetch operation:', error);
       });
   }

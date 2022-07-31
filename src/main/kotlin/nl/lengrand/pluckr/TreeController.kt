@@ -64,16 +64,15 @@ class UserController(private val database: Database){
     fun createUser(email: String, zepassword: String) {
         val salt = gensalt()
         transaction(database) {
-            val user = Users.insert {
-                it[username] = email
-                it[password] = hashpw(zepassword, salt);
+             Users.insert {
+                    it[username] = email
+                    it[password] = hashpw(zepassword, salt);
+                }
             }
-            println("user")
-            println(user)
-            println("---")
+
         }
     }
-}
+
 class TreeController(private val database: Database) {
     fun getTrees() : ArrayList<Tree> {
         val trees : ArrayList<Tree> = arrayListOf()

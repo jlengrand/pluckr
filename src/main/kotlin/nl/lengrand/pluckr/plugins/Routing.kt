@@ -11,7 +11,9 @@ import io.ktor.server.http.content.*
 import io.ktor.server.request.*
 import io.ktor.server.response.*
 import io.ktor.server.sessions.*
+import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
+import java.sql.SQLIntegrityConstraintViolationException
 
 fun Application.configureRouting(database: Database) {
 
@@ -30,8 +32,21 @@ fun Application.configureRouting(database: Database) {
 
         post("/api/signup"){
             val formParameters = call.receiveParameters()
-            val user = userController.createUser(formParameters["username"].toString(), formParameters["password"].toString())
-            call.response.status(HttpStatusCode.OK)
+            try{
+                userController.createUser(formParameters["username"].toString(), formParameters["password"].toString())
+                call.response.status(HttpStatusCode.OK)
+            }
+            catch(e: ExposedSQLException){
+                val message = when (e.sqlState) {
+                    "23505" ->
+                        "User already exists"
+                    else ->
+                        "Unknown error, please retry later"
+                }
+                call.response.status(HttpStatusCode(500, message))
+
+            }
+
         }
 
         get("/api/trees") {
