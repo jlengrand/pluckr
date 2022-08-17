@@ -13,7 +13,6 @@ import io.ktor.server.response.*
 import io.ktor.server.sessions.*
 import org.jetbrains.exposed.exceptions.ExposedSQLException
 import org.jetbrains.exposed.sql.Database
-import java.sql.SQLIntegrityConstraintViolationException
 
 fun Application.configureRouting(database: Database) {
 
@@ -22,12 +21,28 @@ fun Application.configureRouting(database: Database) {
 
     routing {
 
-        authenticate("auth-form") {
-            post("/api/login") {
-                val userName = call.principal<UserIdPrincipal>()?.name.toString()
-                call.sessions.set(UserSession(name = userName))
-                call.respondRedirect("/hello")
+        authenticate("user_session") {
+            get("/api/authenticated"){
+                call.respondText("Hello, ${call.principal<UserSession>()?.name}!")
             }
+        }
+
+        post("/api/login") {
+            val formParameters = call.receiveParameters()
+
+            try{
+                val user = userController.getUser(formParameters["username"].toString(), formParameters["password"].toString())
+                call.sessions.set(UserSession(user.username))
+                call.respondRedirect("/")
+            }
+            catch(e: ExposedSQLException){
+                call.response.status(HttpStatusCode(500, e.message!!))
+            }
+        }
+
+        post("/api/logout") {
+            call.sessions.clear<UserSession>()
+            call.respondRedirect("/")
         }
 
         post("/api/signup"){
@@ -36,7 +51,7 @@ fun Application.configureRouting(database: Database) {
                 userController.createUser(formParameters["username"].toString(), formParameters["password"].toString())
                 call.response.status(HttpStatusCode.OK)
             }
-            catch(e: ExposedSQLException){
+            catch(e: ExposedSQLException){ // TODO: Should I leak exceptions here?
                 val message = when (e.sqlState) {
                     "23505" ->
                         "User already exists"
@@ -44,15 +59,11 @@ fun Application.configureRouting(database: Database) {
                         "Unknown error, please retry later"
                 }
                 call.response.status(HttpStatusCode(500, message))
-
             }
-
         }
 
         get("/api/trees") {
-            println("IN HERE FIRST")
             if(call.request.queryParameters["bbox"] != null){
-                println("IN HERE")
                 val bbox = call.request.queryParameters["bbox"]?.split(",")?.map { it.toDouble() }
                 call.respond(treeController.getTrees(bbox))
             }
@@ -61,9 +72,7 @@ fun Application.configureRouting(database: Database) {
             }
         }
 
-
-
-        get("/hello") {
+        get("/api/hello") {
             call.respondText("Hello the World!")
         }
 

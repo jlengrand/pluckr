@@ -7,15 +7,12 @@ import kotlinx.serialization.encoding.Decoder
 import kotlinx.serialization.encoding.Encoder
 import net.postgis.jdbc.geometry.Point
 import nl.lengrand.pluckr.Trees
-import org.jetbrains.exposed.sql.Database
-import org.jetbrains.exposed.sql.ResultRow
-import org.jetbrains.exposed.sql.selectAll
 import org.jetbrains.exposed.sql.transactions.transaction
 import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.toKotlinLocalDateTime
 import nl.lengrand.pluckr.Users
-import org.jetbrains.exposed.sql.insert
-import org.mindrot.jbcrypt.BCrypt.gensalt
-import org.mindrot.jbcrypt.BCrypt.hashpw
+import org.jetbrains.exposed.sql.*
+import org.mindrot.jbcrypt.BCrypt.*
 
 @Serializable
 data class UserSession(val name: String) : Principal
@@ -56,8 +53,12 @@ object PointSerializer : KSerializer<Point> {
     }
 }
 
-private fun fromRow(it: ResultRow): Tree {
-    return Tree(it[Trees.id], it[Trees.name], it[Trees.description], it[Trees.location])
+private fun ResultRow.toTree(): Tree {
+    return Tree(this[Trees.id], this[Trees.name], this[Trees.description], this[Trees.location])
+}
+
+private fun ResultRow.toUser(): User {
+    return User(this[Users.id], this[Users.username], this[Users.password], this[Users.createdAt].toKotlinLocalDateTime(), this[Users.updatedAt].toKotlinLocalDateTime())
 }
 
 class UserController(private val database: Database){
@@ -65,25 +66,41 @@ class UserController(private val database: Database){
         val salt = gensalt()
         transaction(database) {
              Users.insert {
-                    it[username] = email
-                    it[password] = hashpw(zepassword, salt);
-                }
+                it[username] = email
+                it[password] = hashpw(zepassword, salt);
             }
-
         }
     }
+
+    /*
+    Will throw NoSuchElementException if there are no results, or IllegalArgumentException if there are more than one
+     */
+    private fun getUser(email: String): User {
+        val user =  transaction(database) {
+            Users.select{ Users.username eq email}.single().toUser()
+        }
+        return user
+    }
+
+    fun getUser(email: String, zepassword: String): User {
+        val user = getUser(email)
+        if (!checkpw(zepassword, user.password)) throw AuthenticationException("Incorrect password detected")
+        return user
+    }
+}
 
 class TreeController(private val database: Database) {
     fun getTrees() : ArrayList<Tree> {
         val trees : ArrayList<Tree> = arrayListOf()
         transaction(database){
-            Trees.selectAll().map { trees.add(fromRow(it)) }
+            Trees.selectAll().map { trees.add(it.toTree()) }
         }
         return trees
     }
 
     fun getTrees(bbox: List<Double>?) : ArrayList<Tree> {
-        println(bbox)
         return getTrees()
     }
 }
+
+class AuthenticationException(message:String): Exception(message)

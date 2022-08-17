@@ -18,6 +18,7 @@ export class PluckrLogin extends LitElement {
   static get properties() {
     return {
       signUpOpened: {type: Boolean},
+      logInOpened: {type: Boolean},
       username: {type: String},
       password: {type: String},
       passwordConfirm: {type: String},
@@ -33,6 +34,7 @@ export class PluckrLogin extends LitElement {
   constructor() {
     super();
     this.signUpOpened = false;
+    this.logInOpened = false;
     this.loadingBarActive = false;
   }
 
@@ -40,7 +42,7 @@ export class PluckrLogin extends LitElement {
     return html`
       <vaadin-horizontal-layout slot="navbar touch-optimized" theme="spacing padding">
         <vaadin-button theme="primary" @click="${this.signUpClicked}">Sign up</vaadin-button>
-        <vaadin-button theme="secondary">Login</vaadin-button>
+        <vaadin-button theme="secondary" @click="${this.logInClicked}">Login</vaadin-button>
       </vaadin-horizontal-layout>
 
 
@@ -50,14 +52,52 @@ export class PluckrLogin extends LitElement {
         @opened-changed="${e => (this.signUpOpened = e.detail.value)}"
         ${dialogRenderer(this.signUpRenderer, [this.username, this.signUpOpened, this.password, this.loadingBarActive, this.errorMessage])}
         id="signUp">
+      </vaadin-dialog>
 
+      <vaadin-dialog
+        header-title="LogIn"
+        .opened="${this.logInOpened}"
+        @opened-changed="${e => (this.logInOpened = e.detail.value)}"
+        ${dialogRenderer(this.logInRenderer, [this.username, this.logInOpened, this.password, this.loadingBarActive, this.errorMessage])}
+        id="logIn">
       </vaadin-dialog>
     `;
   }
 
   signUpClicked() {
     this.signUpOpened = true;
-    console.log("Signup clicked!");
+  }
+
+  logInClicked() {
+    this.logInOpened = true;
+  }
+
+  logInRenderer(){
+    return html`
+      <vaadin-form-layout .responsiveSteps="${this.responsiveSteps}">
+        <vaadin-text-field value="${this.username}" @change="${(e) => {
+      this.username = e.target.value
+    }}" label="email"></vaadin-text-field>
+        <vaadin-password-field value="${this.password}" @change="${(e) => {
+      this.password = e.target.value
+    }}" label="Password"></vaadin-password-field>
+
+        ${ this.loadingBarActive ?
+      html`<vaadin-progress-bar indeterminate></vaadin-progress-bar>`
+      : undefined
+    }
+
+        ${ this.errorMessage ?
+      html`<p class="error" style="color:red">${this.errorMessage}</p>`
+      : undefined
+    }
+
+        <vaadin-horizontal-layout theme="spacing padding" style="justify-content: end">
+          <vaadin-button theme="secondary" @click="${() => {this.logInOpened = false}}">Cancel</vaadin-button>
+          <vaadin-button theme="primary" @click="${this.logIn}">LogIn</vaadin-button>
+        </vaadin-horizontal-layout>
+      </vaadin-form-layout>
+    `;
   }
 
   signUpRenderer() {
@@ -94,6 +134,42 @@ export class PluckrLogin extends LitElement {
     `;
   }
 
+  logIn(){
+    this.loadingBarActive = true;
+
+    fetch('/api/login', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded'
+      },
+      body: new URLSearchParams({
+        'username': this.username,
+        'password': this.password,
+      })
+    })
+      .then((response) => {
+        this.loadingBarActive = false;
+        if (!response.ok) {
+          this.errorMessage = response.statusText;
+          console.error('There has been a problem logging in the user:', response.statusText);
+        }
+        else{
+          this.username = null;
+          this.password = null;
+          this.passwordConfirm = null;
+          this.logInOpened = false;
+        }
+      })
+      .catch(error => {
+        this.errorMessage = "There has been an issue contacting the server. Please try again later"
+        console.error('There has been a problem with your fetch operation:', error);
+        this.username = null;
+        this.password = null;
+        this.passwordConfirm = null;
+      });
+  }
+
+
   signUp() {
     this.loadingBarActive = true;
 
@@ -123,6 +199,9 @@ export class PluckrLogin extends LitElement {
       .catch(error => {
         this.errorMessage = "There has been an issue contacting the server. Please try again later"
         console.error('There has been a problem with your fetch operation:', error);
+        this.username = null;
+        this.password = null;
+        this.passwordConfirm = null;
       });
   }
 }
