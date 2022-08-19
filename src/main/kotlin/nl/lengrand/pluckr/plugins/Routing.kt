@@ -31,7 +31,9 @@ fun Application.configureRouting(database: Database) {
             val formParameters = call.receiveParameters()
 
             try{
-                val user = userController.getUser(formParameters["username"].toString(), formParameters["password"].toString())
+                val user = userController.getUser(
+                    formParameters["username"].toString(),
+                    formParameters["password"].toString())
                 call.sessions.set(UserSession(user.username))
                 call.respondRedirect("/")
             }

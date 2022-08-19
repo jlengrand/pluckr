@@ -58,7 +58,13 @@ private fun ResultRow.toTree(): Tree {
 }
 
 private fun ResultRow.toUser(): User {
-    return User(this[Users.id], this[Users.username], this[Users.password], this[Users.createdAt].toKotlinLocalDateTime(), this[Users.updatedAt].toKotlinLocalDateTime())
+    return User(
+        this[Users.id],
+        this[Users.username],
+        this[Users.password],
+        this[Users.createdAt].toKotlinLocalDateTime(),
+        this[Users.updatedAt].toKotlinLocalDateTime()
+    )
 }
 
 class UserController(private val database: Database){
