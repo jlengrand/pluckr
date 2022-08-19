@@ -1,24 +1,58 @@
 package nl.lengrand.pluckr
 
+import UserSession
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
+import io.ktor.server.auth.*
 import io.ktor.server.engine.*
-import io.ktor.server.metrics.micrometer.*
 import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
-import io.ktor.server.plugins.cors.routing.*
+import io.ktor.server.response.*
+import io.ktor.server.sessions.*
 import kotlinx.serialization.json.Json
-import net.postgis.jdbc.geometry.Point
-import nl.lengrand.pluckr.plugins.*
-import org.jetbrains.exposed.sql.*
+import nl.lengrand.pluckr.plugins.configureRouting
+import org.jetbrains.exposed.sql.Database
+import org.jetbrains.exposed.sql.SchemaUtils
+import org.jetbrains.exposed.sql.StdOutSqlLogger
+import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
 fun Application.myapp(){
 
     val database = initDb()
 
-    install(CORS)
+    install(Sessions) {
+        cookie<UserSession>("user_session", SessionStorageMemory()) {
+            cookie.path = "/"
+            cookie.maxAgeInSeconds = 6000
+        }
+    }
+
+    install(Authentication) {
+        session<UserSession>("user_session") {
+            println("validating session!")
+
+
+            validate { session ->
+                if(session.name.isNotEmpty()) {
+                    println("Valid!")
+                    println(session)
+                    session
+                } else {
+                    println("Not valid!")
+                    println(session)
+                    null
+                }
+            }
+            challenge {
+                println("redirecting")
+                call.respondRedirect("/")
+            }
+        }
+    }
+
+//    install(CORS)
     install(ContentNegotiation){
         json(Json {
             prettyPrint = true
@@ -27,7 +61,6 @@ fun Application.myapp(){
     }
     install(CallLogging)
 //    install(MicrometerMetrics)
-
     configureRouting(database)
 }
 
@@ -37,24 +70,7 @@ fun initDb(): Database {
 
     transaction {
         addLogger(StdOutSqlLogger)
-
-        SchemaUtils.create(Trees)
-
-//        val first = Tree.new {
-//            name = "Laurier"
-//            description = "un laurier accessible à tous"
-//            location = Point(52.04681865145196, 5.079779509938945)
-//        }
-
-//        Trees.insert {
-//            it[name] = "Laurier 2"
-//            it[description] = "un laurier accessible à tous"
-//            it[location] = Point(52.04681865145196, 5.079779509938945)
-//        }
-
-
-//        println("Trees: ${Tree.all().joinToString {it.location.value}}")
-
+        SchemaUtils.create(Trees, Users)
     }
     return database
 }

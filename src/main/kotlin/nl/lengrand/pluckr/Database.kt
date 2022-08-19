@@ -5,6 +5,8 @@ import net.postgis.jdbc.geometry.Point
 import org.jetbrains.exposed.sql.Column
 import org.jetbrains.exposed.sql.ColumnType
 import org.jetbrains.exposed.sql.Table
+import org.jetbrains.exposed.sql.javatime.datetime
+import java.time.LocalDateTime
 
 object Trees : Table() {
     val id = integer("id").autoIncrement()
@@ -13,6 +15,14 @@ object Trees : Table() {
     val location = point("location")
 
     override val primaryKey = PrimaryKey(id) // name is optional here
+}
+
+object Users: Table() {
+    val id = integer("id").autoIncrement()
+    val username = varchar("username", 100).uniqueIndex()
+    val password = varchar("password", 100)
+    val createdAt = datetime("created_at").clientDefault{ LocalDateTime.now() }
+    val updatedAt = datetime("updatedAt").clientDefault{ LocalDateTime.now() }
 }
 
 fun Table.point(name: String, srid: Int = 4326): Column<Point>
