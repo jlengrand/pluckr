@@ -24,6 +24,7 @@ The project is in 3 separate pieces. You need to :
 * Automated deployment
 * Setup local and remote db
 * Build the freaking project
+* How to see trends with Detekt?
 
 ## License
 
