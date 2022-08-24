@@ -18,7 +18,7 @@ import org.jetbrains.exposed.sql.StdOutSqlLogger
 import org.jetbrains.exposed.sql.addLogger
 import org.jetbrains.exposed.sql.transactions.transaction
 
-fun Application.myapp(){
+fun Application.module() {
 
     val database = initDb()
 
@@ -33,9 +33,8 @@ fun Application.myapp(){
         session<UserSession>("user_session") {
             println("validating session!")
 
-
             validate { session ->
-                if(session.name.isNotEmpty()) {
+                if (session.name.isNotEmpty()) {
                     println("Valid!")
                     println(session)
                     session
@@ -53,7 +52,7 @@ fun Application.myapp(){
     }
 
 //    install(CORS)
-    install(ContentNegotiation){
+    install(ContentNegotiation) {
         json(Json {
             prettyPrint = true
             isLenient = true
@@ -65,8 +64,10 @@ fun Application.myapp(){
 }
 
 fun initDb(): Database {
-    val database = Database.connect("jdbc:postgresql://localhost:5432/pluckr", driver = "org.postgresql.Driver",
-        user = "pluckr", password = System.getenv("PLUCKR_PASSWORD"))
+    val database = Database.connect(
+        "jdbc:postgresql://localhost:5432/pluckr", driver = "org.postgresql.Driver",
+        user = "pluckr", password = System.getenv("PLUCKR_PASSWORD")
+    )
 
     transaction {
         addLogger(StdOutSqlLogger)
@@ -78,8 +79,10 @@ fun initDb(): Database {
 fun main() {
     embeddedServer(
         Netty,
-        module =  Application::myapp,
         port = 9090,
-        host = "0.0.0.0")
+        host = "0.0.0.0"
+    ){
+        module()
+    }
         .start(wait = true)
 }

@@ -39,7 +39,6 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.ktor:ktor-server-sessions:$ktor_version")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
 
     implementation("org.mindrot:jbcrypt:0.4")
@@ -52,7 +51,10 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("net.postgis:postgis-jdbc:$postgisVersion")
+    implementation("io.ktor:ktor-server-sessions-jvm:2.1.0")
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:2.1.0")
 }

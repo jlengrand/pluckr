@@ -32,7 +32,7 @@ data class Tree(
     val name: String,
     val description: String?,
     @Serializable(with = PointSerializer::class)
-    val location : Point
+    val location: Point
 )
 
 @Serializable
@@ -67,11 +67,11 @@ private fun ResultRow.toUser(): User {
     )
 }
 
-class UserController(private val database: Database){
+class UserController(private val database: Database) {
     fun createUser(email: String, zepassword: String) {
         val salt = gensalt()
         transaction(database) {
-             Users.insert {
+            Users.insert {
                 it[username] = email
                 it[password] = hashpw(zepassword, salt);
             }
@@ -82,8 +82,8 @@ class UserController(private val database: Database){
     Will throw NoSuchElementException if there are no results, or IllegalArgumentException if there are more than one
      */
     private fun getUser(email: String): User {
-        val user =  transaction(database) {
-            Users.select{ Users.username eq email}.single().toUser()
+        val user = transaction(database) {
+            Users.select { Users.username eq email }.single().toUser()
         }
         return user
     }
@@ -96,17 +96,17 @@ class UserController(private val database: Database){
 }
 
 class TreeController(private val database: Database) {
-    fun getTrees() : ArrayList<Tree> {
-        val trees : ArrayList<Tree> = arrayListOf()
-        transaction(database){
+    fun getTrees(): ArrayList<Tree> {
+        val trees: ArrayList<Tree> = arrayListOf()
+        transaction(database) {
             Trees.selectAll().map { trees.add(it.toTree()) }
         }
         return trees
     }
 
-    fun getTrees(bbox: List<Double>?) : ArrayList<Tree> {
+    fun getTrees(bbox: List<Double>?): ArrayList<Tree> {
         return getTrees()
     }
 }
 
-class AuthenticationException(message:String): Exception(message)
+class AuthenticationException(message: String) : Exception(message)

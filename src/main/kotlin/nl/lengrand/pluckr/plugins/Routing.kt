@@ -22,7 +22,7 @@ fun Application.configureRouting(database: Database) {
     routing {
 
         authenticate("user_session") {
-            get("/api/authenticated"){
+            get("/api/authenticated") {
                 call.respondText("Hello, ${call.principal<UserSession>()?.name}!")
             }
         }
@@ -30,14 +30,14 @@ fun Application.configureRouting(database: Database) {
         post("/api/login") {
             val formParameters = call.receiveParameters()
 
-            try{
+            try {
                 val user = userController.getUser(
                     formParameters["username"].toString(),
-                    formParameters["password"].toString())
+                    formParameters["password"].toString()
+                )
                 call.sessions.set(UserSession(user.username))
                 call.respondRedirect("/")
-            }
-            catch(e: ExposedSQLException){
+            } catch (e: ExposedSQLException) {
                 call.response.status(HttpStatusCode(500, e.message!!))
             }
         }
@@ -47,16 +47,16 @@ fun Application.configureRouting(database: Database) {
             call.respondRedirect("/")
         }
 
-        post("/api/signup"){
+        post("/api/signup") {
             val formParameters = call.receiveParameters()
-            try{
+            try {
                 userController.createUser(formParameters["username"].toString(), formParameters["password"].toString())
                 call.response.status(HttpStatusCode.OK)
-            }
-            catch(e: ExposedSQLException){ // TODO: Should I leak exceptions here?
+            } catch (e: ExposedSQLException) { // TODO: Should I leak exceptions here?
                 val message = when (e.sqlState) {
                     "23505" ->
                         "User already exists"
+
                     else ->
                         "Unknown error, please retry later"
                 }
@@ -65,11 +65,10 @@ fun Application.configureRouting(database: Database) {
         }
 
         get("/api/trees") {
-            if(call.request.queryParameters["bbox"] != null){
+            if (call.request.queryParameters["bbox"] != null) {
                 val bbox = call.request.queryParameters["bbox"]?.split(",")?.map { it.toDouble() }
                 call.respond(treeController.getTrees(bbox))
-            }
-            else{
+            } else {
                 call.respond(treeController.getTrees())
             }
         }
