@@ -12,10 +12,10 @@ The frontend is buildt with [Open-WC](https://open-wc.org/), [Lit](http://lit.de
 The project is in 3 separate pieces. You need to : 
 
 * Fire up a PostgreSQL database, I use a local Docker image for the moment
-
 * Fire the backend. You do this using `./gradlew run`. 
+  * By default, the app will run with a H2 in memory database. Change the config file to run another configuration 
+  * ( ex: `$./gradlew run --args="-config=src/main/resources/application.test.conf`)
 * Fire the frontend. It is located in `src/js/pluckr-app`. Run `npm install` and then `npm start`
-
 
 ## TODOs
 
@@ -28,7 +28,7 @@ The project is in 3 separate pieces. You need to :
 
 ## License
 
-This is a personal project, you may do anything with it without my permission 😊.
+This is a personal project, you may not do anything with it without my permission 😊.
 All rights reserved.
 
 ## Author
