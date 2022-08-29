@@ -1,5 +1,9 @@
 # Pluckr
 
+[![codecov](https://codecov.io/gh/jlengrand/pluckr/branch/main/graph/badge.svg?token=PZIA4K6CMJ)](https://codecov.io/gh/jlengrand/pluckr)
+[![Build frontend](https://github.com/jlengrand/pluckr/actions/workflows/build-frontend.yml/badge.svg)](https://github.com/jlengrand/pluckr/actions/workflows/build-frontend.yml)
+[![Kotlin CI with Gradle](https://github.com/jlengrand/pluckr/actions/workflows/build-backend.yml/badge.svg)](https://github.com/jlengrand/pluckr/actions/workflows/build-backend.yml)
+
 Pluckr is a (currently non-functional) project aiming at helping folks find available trees, plants and spices to pluck from.
 
 ## About the project
