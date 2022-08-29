@@ -21,11 +21,11 @@ fun Application.module() {
     val env = environment.config.propertyOrNull("ktor.environment")?.getString()
     println("Running in the $env environment")
 
-//    routing {
-//        get("/api/environment") {
-//            call.respondText(env?: "null")
-//        }
-//    }
+    routing {
+        get("/api/environment") {
+            call.respondText(env?: "null")
+        }
+    }
 
     val database = initDb(
         environment.config.property("ktor.database.url").getString(),
