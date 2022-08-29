@@ -21,6 +21,11 @@ fun Application.configureRouting(database: Database) {
 
     routing {
 
+        get ("/api/session"){
+            val userSession = call.sessions.get<UserSession>()
+            call.respond(userSession?:"{}")
+        }
+
         authenticate("user_session") {
             get("/api/authenticated") {
                 call.respondText("Hello, ${call.principal<UserSession>()?.name}!")
