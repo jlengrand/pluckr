@@ -9,6 +9,11 @@ plugins {
     application
     kotlin("jvm") version "1.7.0"
     kotlin("plugin.serialization") version "1.6.21"
+
+    // Clean project
+    id("io.gitlab.arturbosch.detekt").version("1.21.0")
+    id("org.jetbrains.kotlinx.kover") version "0.4.2"
+
 }
 
 
@@ -34,8 +39,8 @@ dependencies {
     implementation("io.ktor:ktor-server-call-logging:$ktor_version")
     implementation("io.ktor:ktor-server-metrics-micrometer:$ktor_version")
     implementation("io.ktor:ktor-server-cors:$ktor_version")
-    implementation("io.ktor:ktor-server-sessions:$ktor_version")
     implementation("io.ktor:ktor-server-auth:$ktor_version")
+    implementation("io.ktor:ktor-server-sessions-jvm:2.1.0")
 
     implementation("org.mindrot:jbcrypt:0.4")
 
@@ -47,7 +52,11 @@ dependencies {
     implementation("io.ktor:ktor-serialization-kotlinx-json:$ktor_version")
     implementation("org.postgresql:postgresql:$postgresqlVersion")
     implementation("net.postgis:postgis-jdbc:$postgisVersion")
+    implementation("com.h2database:h2:2.1.214")
+
 
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
+    testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
+    testImplementation("io.ktor:ktor-server-test-host-jvm:2.1.0")
 }
