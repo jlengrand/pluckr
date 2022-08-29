@@ -7,7 +7,7 @@ const hmr = process.argv.includes('--hmr');
 export default /** @type {import('@web/dev-server').DevServerConfig} */ ({
   middleware: [
     proxy('/api', {
-      target: 'http://localhost:9090',
+      target: 'http://localhost:8080',
     }),
   ],
 

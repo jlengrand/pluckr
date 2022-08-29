@@ -11,8 +11,8 @@ plugins {
     kotlin("plugin.serialization") version "1.6.21"
 
     // Clean project
-//    id("org.jetbrains.kotlinx.kover") version "0.4.2"
     id("io.gitlab.arturbosch.detekt").version("1.21.0")
+    id("org.jetbrains.kotlinx.kover") version "0.4.2"
 
 }
 

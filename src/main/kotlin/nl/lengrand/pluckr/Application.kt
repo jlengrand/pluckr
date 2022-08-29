@@ -4,8 +4,6 @@ import UserSession
 import io.ktor.serialization.kotlinx.json.*
 import io.ktor.server.application.*
 import io.ktor.server.auth.*
-import io.ktor.server.engine.*
-import io.ktor.server.netty.*
 import io.ktor.server.plugins.callloging.*
 import io.ktor.server.plugins.contentnegotiation.*
 import io.ktor.server.response.*
@@ -23,11 +21,11 @@ fun Application.module() {
     val env = environment.config.propertyOrNull("ktor.environment")?.getString()
     println("Running in the $env environment")
 
-    routing {
-        get("/api/environment") {
-            call.respondText(env?: "null")
-        }
-    }
+//    routing {
+//        get("/api/environment") {
+//            call.respondText(env?: "null")
+//        }
+//    }
 
     val database = initDb(
         environment.config.property("ktor.database.url").getString(),
@@ -86,16 +84,5 @@ fun initDb(url: String, driver: String, user: String, password: String): Databas
     }
     return database
 }
-
-//fun main() {
-//    embeddedServer(
-//        Netty,
-//        port = 9090,
-//        host = "0.0.0.0"
-//    ){
-//        module()
-//    }
-//        .start(wait = true)
-//}
 
 fun main(args: Array<String>): Unit = io.ktor.server.netty.EngineMain.main(args)
