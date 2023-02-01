@@ -67,6 +67,7 @@ val installWebDependencies by tasks.registering(NpmTask::class){
     args.set(listOf("install"))
 }
 
+
 val buildWebDependencies by tasks.registering(NpmTask::class){
     dependsOn(installWebDependencies)
     workingDir.set(File("./src/main/js/pluckr-app"))

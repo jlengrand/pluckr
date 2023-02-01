@@ -20,6 +20,7 @@ export class PluckrLogin extends LitElement {
       passwordConfirm: { type: String },
       loadingBarActive: { type: Boolean },
       errorMessage: { type: String },
+      session: {type: Object}
     };
   }
 
@@ -40,12 +41,21 @@ export class PluckrLogin extends LitElement {
         slot="navbar touch-optimized"
         theme="spacing padding"
       >
-        <vaadin-button theme="primary" @click="${this.signUpClicked}"
-          >Sign up</vaadin-button
-        >
-        <vaadin-button theme="secondary" @click="${this.logInClicked}"
-          >Login</vaadin-button
-        >
+        ${this.session == null || Object.keys(this.session).length === 0?
+          html `
+            <vaadin-button theme="primary" @click="${this.signUpClicked}"
+            >Sign up</vaadin-button
+            >
+            <vaadin-button theme="secondary" @click="${this.logInClicked}"
+            >Login</vaadin-button
+            >
+          ` :
+          html`
+            <vaadin-button theme="secondary" @click="${this.logout}"
+            >Logout</vaadin-button
+            >
+          `
+        }
       </vaadin-horizontal-layout>
 
       <vaadin-dialog
@@ -187,6 +197,22 @@ export class PluckrLogin extends LitElement {
     `;
   }
 
+  logout(){
+    fetch("/api/logout", {
+      method: 'POST',
+    })
+      .then(response => {
+        if (!response.ok) {
+          console.error('There has been a problem logging the user out', response.statusText);
+        }
+      })
+      .catch(error => {
+        console.error('There has been a problem logging the user out', error);
+      });
+
+    this.dispatchEvent(new Event('session-event', {bubbles: true, composed: true}));
+  }
+
   logIn() {
     this.loadingBarActive = true;
 
@@ -226,6 +252,8 @@ export class PluckrLogin extends LitElement {
         this.password = null;
         this.passwordConfirm = null;
       });
+
+    this.dispatchEvent(new Event('session-event', {bubbles: true, composed: true}));
   }
 
   signUp() {
@@ -268,5 +296,7 @@ export class PluckrLogin extends LitElement {
         this.password = null;
         this.passwordConfirm = null;
       });
+
+    this.dispatchEvent(new Event('session-event', {bubbles: true, composed: true}));
   }
 }

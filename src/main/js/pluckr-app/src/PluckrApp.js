@@ -18,6 +18,7 @@ export class PluckrApp extends LitElement {
     return {
       title: { type: String },
       location: { type: Object },
+      session : { type: Object}
     };
   }
 
@@ -56,6 +57,11 @@ export class PluckrApp extends LitElement {
     super();
     this.title = 'Pluckr';
     this.location = { x: 52.0474828687443, y: 5.080036739440433 };
+
+    this.addEventListener('session-event', (e) => {
+      console.log(e.type, e.target.localName)
+      this.loadUserSession();
+    });
   }
 
   firstUpdated(_changedProperties) {
@@ -81,6 +87,19 @@ export class PluckrApp extends LitElement {
     this.map.on('moveend', this.moveEnd.bind(this));
 
     this.loadMarkers(this.map.getBounds());
+
+    this.loadUserSession();
+  }
+
+  loadUserSession(){
+    fetch('/api/session')
+      .then(response => response.json())
+      .then(data => {
+        this.session = data
+      })
+      .catch(error => {
+        console.error('Error while fetching session:', error);
+      });
   }
 
   loadMarkers(bounds) {
@@ -125,7 +144,7 @@ export class PluckrApp extends LitElement {
         <vaadin-drawer-toggle slot="navbar touch-optimized">
         </vaadin-drawer-toggle>
         <h3 slot="navbar touch-optimized">${this.title}</h3>
-        <pluckr-login slot="navbar"></pluckr-login>
+        <pluckr-login .session=${this.session} slot="navbar"></pluckr-login>
         <div>
           <vaadin-text-field placeholder="Search">
             <vaadin-icon slot="prefix" icon="vaadin:search"></vaadin-icon>

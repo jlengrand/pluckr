@@ -23,8 +23,9 @@ The project is in 3 separate pieces. You need to :
 
 ## TODOs
 
-* Adds tests and install [Kover](https://lengrand.fr/kover-code-coverage-plugin-for-kotlin/)
-* Look into Qonada and Detekt
+* ~~Adds tests and install [Kover](https://lengrand.fr/kover-code-coverage-plugin-for-kotlin/)~~
+* Look into Qonada and ~~Detekt~~
+* Insert NpmStart inside gradle run
 * Automated deployment
 * Setup local and remote db
 * Build the freaking project
