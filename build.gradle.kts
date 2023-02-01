@@ -1,3 +1,5 @@
+import com.github.gradle.node.npm.task.NpmTask
+
 val ktor_version: String by project
 val kotlin_version: String by project
 val logback_version: String by project
@@ -14,8 +16,8 @@ plugins {
     id("io.gitlab.arturbosch.detekt").version("1.21.0")
     id("org.jetbrains.kotlinx.kover") version "0.4.2"
 
+    id("com.github.node-gradle.node") version "3.4.0"
 }
-
 
 group = "nl.lengrand.pluckr"
 version = "0.0.1"
@@ -54,9 +56,24 @@ dependencies {
     implementation("net.postgis:postgis-jdbc:$postgisVersion")
     implementation("com.h2database:h2:2.1.214")
 
-
     testImplementation("io.ktor:ktor-server-tests-jvm:$ktor_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test-junit:$kotlin_version")
     testImplementation("org.jetbrains.kotlin:kotlin-test:$kotlin_version")
     testImplementation("io.ktor:ktor-server-test-host-jvm:2.1.0")
+}
+
+val installWebDependencies by tasks.registering(NpmTask::class){
+    workingDir.set(File("./src/main/js/pluckr-app"))
+    args.set(listOf("install"))
+}
+
+
+val buildWebDependencies by tasks.registering(NpmTask::class){
+    dependsOn(installWebDependencies)
+    workingDir.set(File("./src/main/js/pluckr-app"))
+    args.set(listOf("run", "build"))
+}
+
+tasks.build {
+    dependsOn(buildWebDependencies)
 }
